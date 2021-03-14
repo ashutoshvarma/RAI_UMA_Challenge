@@ -14,7 +14,8 @@ fees on Ethereum safely and securely.
 
 In this challenge I created a synth asset `RR-RAI-APR21` tracking RAI redemption rate.
 
-Also a DApp(fork of UMAProtocol/emp-tools) to interact with my EMP and manage/create their positions.
+Also a DApp (fork of UMAProtocol/emp-tools) to interact with my EMP and manage/create their positions.
+
 https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
 
@@ -37,9 +38,12 @@ To mitigate this for somme extent we can use `annualizedRate` which is scaled ve
 annualizedRate = (redemptionRate) ^ (365 * 12 * 30 * 24 * 3600)
 ```
 
-Lastly, to prevent market manuplation due to flash loans and other factors which can make `Redemption_Rate` volatile for very short period (which can casue sudden liquidations) we will take Time Weighted Average Price (TWAP) of `annualizedRate`.
+I avoided using complex scaling methods to keep implementaion as simple as possible. (In case of dispute, every UMA shareholder should be able to calculate correct price without any issue. Also same price value should be reproducable accross different programming languages like python, bash upto 18 decimals (Wei) incase someone decides to use different langauge)
+
+Lastly, to prevent market manuplation due to flash loans and other factors which can make `Redemption_Rate` volatile for very short period (which can casue sudden liquidations) so we should take Time Weighted Average Price (TWAP) of `annualizedRate`.
 
 #### PriceFeed Implementation
+`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default)``
 Source of data :- 
 - https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai/
 - `UpdateRedemptionRate` Event from [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#events) contract
@@ -110,6 +114,10 @@ A Simple DApp to interact with EMP, manage position, deposit collateral, redeem 
 3. Add dummy price config for `RR-RAI-APR21` synth.
 
 ### Deployment Testing
+
+#### Liquidator Bot
+####
+
 
 
 ## Refrence
