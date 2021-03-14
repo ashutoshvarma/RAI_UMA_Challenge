@@ -1,13 +1,15 @@
-# RAI_UMA_Challenge
+# RAI X UMA Challenge by Reflexer Labs
 
-## Challenge
+
+# <pre>**Challenge**</pre>
 https://gitcoin.co/issue/reflexer-labs/geb/97/100024834
 
 To build a synthetic asset tracking the
 [Kovan RAI](https://github.com/reflexer-labs/geb-changelog/tree/master/releases/kovan/1.4.0/median/fixed-discount)
 redemption rate movements using [UMA](https://docs.umaproject.org/build-walkthrough/build-process).
 
-## Overview
+# <pre>**Overview**</pre>
+
 UMA is a fast, flexible and secure way to create synthetic assets on Ethereum. UMA has defined a novel architecture
 that enables anyone to create a synth asset that can track virtually anything from stock markets in Iran to gas 
 fees on Ethereum safely and securely.
@@ -19,9 +21,9 @@ Also a DApp (fork of UMAProtocol/emp-tools) to interact with my EMP and manage/c
 https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
 
-## Solution
+# <pre>**Solution**</pre>
 
-### Pricing Model
+## Pricing Model
 `Redemption_Rate` is the rate at which RAI is being devalued or revalued, it can therefore be negative as well. It is stored as `redemptionRate` in `OracleRelayer` relayer contract. Mathematically,
 ```
 redemptionRate = Redemption_Rate + 1
@@ -42,7 +44,7 @@ I avoided using complex scaling methods to keep implementaion as simple as possi
 
 Lastly, to prevent market manuplation due to flash loans and other factors which can make `Redemption_Rate` volatile for very short period (which can casue sudden liquidations) so we should take Time Weighted Average Price (TWAP) of `annualizedRate`.
 
-#### PriceFeed Implementation
+### PriceFeed Implementation
 Sources of data :- 
 - https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai/
 - `UpdateRedemptionRate` Event from [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#events) contract
@@ -74,10 +76,10 @@ CURRENT_PRICE = TWAP(PRICES)
 
 **Why don't just read `redemptionRate` from `OracleRelayer` ?**
 
-Problem is that we need timestamp for price also to calculate TWAP, reading the value from contract will not give us timestamp of price. 
+Problem is that we need timestamp for a given price also inorder to calculate correct TWAP, reading the value from contract will not give us timestamp of price. 
 
 
-#### Code & Tests
+### Code & Tests
 The full implementation of price feed with unit tests is contained in UMA protocol repo's fork.
 https://github.com/ashutoshvarma/protocol
 
@@ -89,22 +91,22 @@ https://github.com/ashutoshvarma/protocol
 _UMA's `Networker` class does not support sending POST requests which was nesseary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR_ https://github.com/UMAprotocol/protocol/pull/2691
 
 
-### Deployment and Testing
+## <pre>**Deployment and Testing**</pre>
 1. `RaiRedemptionPriceFeed` code has been tested with unit tests in the fork repo.
 2. EMP UMA Contract (along with Synth Token) has been deployed to Kovan Testnet
 3. Default price-feed configuration for has been added for bots to work with minimal configuration - [eacb633](https://github.com/ashutoshvarma/protocol/commit/eacb6338ab598d28e0a30fcf4050154087b159cd)
 4. Uniswap Swap Pool (RAI-Synth) has been made to trade synths - [here](https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA4DFa07C2)
 5. Deployed a Dapp to interact with EMP, manage position, deposit collateral, redeem synth and view positions or liquidations. (Fork from [emp-tools](https://github.com/UMAprotocol/emp-tools/)) - [Here](https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/?address=0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3)
 
-### Setup & Configuration
-#### Collateral Currency - RAI
+## Setup & Configuration
+### Collateral Currency - RAI
 Added buy UMA team to `
 AddressWhitelist`. through this [transaction](https://kovan.etherscan.io/tx/0x006f18d76ba32ae42e2ca73eea703c9c5574c835773b447342bd46e71964ae6f)
 
-#### Price Indentifier Name - `RaiRedemptionRate`
+### Price Indentifier Name - `RaiRedemptionRate`
 Added by UMA Team to `IdentifierWhitelist` through this [transaction](https://kovan.etherscan.io/tx/0x5cc0ccb70a86480af46385105d1b3e6318554df7c503ee43c055de77a0fb2b9b)
 
-#### Synth Token - `RR-RAI-APR21`
+### Synth Token - `RR-RAI-APR21`
 ```
 syntheticName: "RAI Redemption Rate [RR April 2021]", 
 syntheticSymbol: 'RR-RAI-APR21', 
@@ -113,7 +115,7 @@ Token Deployed (by EMP) at
 https://kovan.etherscan.io/token/0xcac5b5ac9f4af1a4b73a12cd007a64ba4dfa07c2
 
 
-#### EMP Parameteres
+### EMP Parameteres
 ```
 Expiry date: 30/04/2021, 16:30:00 UTC
 Price identifier: RaiRedemptionRate
@@ -126,7 +128,7 @@ EMP Contract Deployed  to Kovan using launch-emp scipts provided by UMA at
 https://kovan.etherscan.io/address/0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
 
 
-### DApp
+## DApp
 Deployed - https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
 Source - https://github.com/ashutoshvarma/emp-tools
@@ -136,17 +138,10 @@ Source - https://github.com/ashutoshvarma/emp-tools
 A Simple DApp to interact with EMP, manage position, deposit collateral, redeem synth and view positions or liquidations.
 (Fork from [emp-tools](https://github.com/UMAprotocol/emp-tools/))
 
-#### Changes made to make it compatible with RAI EMP contract 
+### Changes made to make it compatible with RAI EMP contract 
 1. Disbale DevMining interfaces
 2. Replace Old EMP ABI methods with updated one.
 3. Add dummy price config for `RR-RAI-APR21` synth.
-
-### Deployment Testing
-
-#### Liquidator Bot
-####
-
-
 
 ## Refrence
 ### RAI
