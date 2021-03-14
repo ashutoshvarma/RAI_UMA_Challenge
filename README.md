@@ -43,22 +43,50 @@ I avoided using complex scaling methods to keep implementaion as simple as possi
 Lastly, to prevent market manuplation due to flash loans and other factors which can make `Redemption_Rate` volatile for very short period (which can casue sudden liquidations) so we should take Time Weighted Average Price (TWAP) of `annualizedRate`.
 
 #### PriceFeed Implementation
-`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default)``
-Source of data :- 
+Sources of data :- 
 - https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai/
 - `UpdateRedemptionRate` Event from [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#events) contract
 
+
+`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default) of `annualizedRate`. While calculating TWAP timestamp of asset price should be accurate so for that purpose it will use timestamp of block in which `redemptionRate` is changed (or `UpdateRedemptionRate` event block time).
+
+Since `redemptionRate` is updated every `updateRateDelay` (saved in [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#readContract)) seconds, for Kovan it is 3 Hrs so TWAP length is kept 8 hrs to make sure atleast 2 `annualizedRate` are used to calculate price.
+Also sometimes there is delay of 15min in rate updation ( see https://discord.com/channels/698935373568540753/698936206691401759/818863474364514352 for full discussion).
+
+There is delay of about 40-60s (or sometimes more) in indexing new events to subgraph, so to prevent calculating wrong TWAP for a given time we employ following logic
+
+```
+PRICES = QUERY_SUBGRAPH()                         // Fetch prices from subgraph (with block number to compute timestamp)
+
+LATEST_SUBGRAPH_TIMESTAMP = PRICES[0].timestamp   // Subgraphs's latest price's (block) timestamp 
+
+NEXT_RATE_UPDATE_TIME = LATEST_SUBGRAPH_TIMESTAMP + UPDATE_RATE_DELAY     // time when rate will be changed by RAI bots
+
+IF CURRENT_TIME > NEXT_RATE_UPDATE_TIME:                                    // If this is true, that means subgraph might not have lastest price indexed.
+    LATEST_PRICE = PRICE_FROM_MOST_RECENT_EVENT()                           // Try to get price from latest UpdateRedemptionRate event
+    IF LATEST_PRICE && LATEST_PRICE.timestamp > LATEST_SUBGRAPH_TIMESTAMP:  // If price from event is newer than lastest subgraph 
+        PRICES.push(LATEST_PRICE)                                           // add to prices list
+    END
+END
+
+CURRENT_PRICE = TWAP(PRICES)
+```
+
+**Why don't just read `redemptionRate` from `OracleRelayer` ?**
+
+Problem is that we need timestamp for price also to calculate TWAP, reading the value from contract will not give us timestamp of price. 
 
 
 #### Code & Tests
 The full implementation of price feed with unit tests is contained in UMA protocol repo's fork.
 https://github.com/ashutoshvarma/protocol
 
-RaiRedemptionPriceFeed - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/src/price-feed/RAIRedemptionRatePriceFeed.js)
+**RaiRedemptionPriceFeed** - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/src/price-feed/RAIRedemptionRatePriceFeed.js)
 
-Unit tests - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/test/truffle/RAIRedemptionRatePriceFeed.js)
+**Unit tests** - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/test/truffle/RAIRedemptionRatePriceFeed.js)
+ 
 
-UMA's `Networker` class does not support sending POST requests which was nesseary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR https://github.com/UMAprotocol/protocol/pull/2691
+_UMA's `Networker` class does not support sending POST requests which was nesseary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR_ https://github.com/UMAprotocol/protocol/pull/2691
 
 
 ### Deployment and Testing
