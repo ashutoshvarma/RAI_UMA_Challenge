@@ -157,13 +157,14 @@ A Simple DApp to interact with EMP, manage the position, deposit collateral, red
 1. Disable DevMining interfaces
 2. Use updated EMP ABI.
 3. Replace Old EMP ABI methods with the updated ones.
-4. Add dummy price config for `RR-RAI-APR21` synth.
+4. Add dummy price config for `RR-RAI-APR21` synth. (Its hardcoded to 1 for good approximation as due to time constraints I could'nt deploy price API for this.)
 
 ![image](https://user-images.githubusercontent.com/17181457/111082409-1e672c80-852e-11eb-8b11-5eddda7493cf.png)
 ![image](https://user-images.githubusercontent.com/17181457/111082932-ffb66500-8530-11eb-9286-b0c242d00a85.png)
 ![image](https://user-images.githubusercontent.com/17181457/111082962-21175100-8531-11eb-809b-d092f4b0ee4e.png)
 
 Since no breaking changes were made to this, no new tests are written. Old tests are still passing by the way.
+
 
 
 # <pre>**# Testing the Deployment**</pre> 
