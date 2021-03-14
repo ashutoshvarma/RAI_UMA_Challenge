@@ -135,6 +135,15 @@ https://kovan.etherscan.io/address/0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
 _While trying to deploy EMP using UMAProject/launch-emp scripts I faced some errors due to incompatibility between old ganache-cli version and node 14, I made a small PR for this also_ ,https://github.com/UMAprotocol/launch-emp/pull/14
 
 
+# <pre>**Uniswap Pool - `RAI` & `RR-RAI-APR21`**</pre>
+Create and add liquidity to Kovan Uniswap Pool of `RAI` and ``RR-RAI-APR21``.
+
+https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA4DFa07C2
+
+**Pool Address** - https://kovan.etherscan.io/address/0xff0ca43fc5444dc464177cbd82419d42db1af761#tokentxns
+
+**NOTE**:- You might need to import `RAI` & `RR-RAI-APR21` tokens in uniswap.
+
 # <pre>**LIVE DApp**</pre>
 
 **Live** - https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
