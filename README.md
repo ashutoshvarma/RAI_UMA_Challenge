@@ -163,6 +163,448 @@ A Simple DApp to interact with EMP, manage position, deposit collateral, redeem 
 ![image](https://user-images.githubusercontent.com/17181457/111082932-ffb66500-8530-11eb-9286-b0c242d00a85.png)
 ![image](https://user-images.githubusercontent.com/17181457/111082962-21175100-8531-11eb-809b-d092f4b0ee4e.png)
 
+Since no breaking changes were made to this, no new tests are written. Old tests are still passing by the way.
+
+
+# <pre>**Testing the Deployment**</pre> 
+**(All the interactions with EMP contract is done using the above DApp.)**
+## Preperation
+### Liquidator Bot Config
+**Liquidator Address** - https://kovan.etherscan.io/address/0xfce1cb7ee0ea8926c2bbcc68d1d927555f9f7256
+
+Added 150 RAI, 100 RR-RAI-APR21 and some ETH to liquidator address (see for more info https://docs.umaproject.org/developers/bots#funding-accounts)
+
+```
+SLACK_WEBHOOK=https://hooks.slack.com/services/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
+MNEMONIC=skin moment wagon special donkey excuse brown fruit wall put sunny ecology
+EMP_ADDRESS=0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
+COMMAND=yarn truffle exec ./packages/liquidator/index.js --network kovan_mnemonic
+```
+
+### Disputer Bot Config
+**Disputer Address** - https://kovan.etherscan.io/address/0x384681B59E798E345dE15D9be9362FC63E00f7f5
+
+Added 150 RAI, 100 RR-RAI-APR21 and some ETH to Disputer address (see for more info https://docs.umaproject.org/developers/bots#funding-accounts)
+
+```
+SLACK_WEBHOOK=https://hooks.slack.com/services/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
+MNEMONIC=drip sniff surface alien notice chuckle dash charge claim solid runway arrive
+EMP_ADDRESS=0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
+COMMAND=yarn truffle exec ./packages/disputer/index.js --network kovan_mnemonic
+```
+
+## 1. Miniting
+A new position is created where `200` RAI is deposited for 100 `RR-RAI-APR21`
+
+**Sponsor** - 0x1920F59D3De3cd1753fC677c9d431C99777B9a99
+
+**Transcation** - https://kovan.etherscan.io/tx/0x717b5c305ab2abbdd29a8cab62a99cbdf66469f1ce6b7de69d310ddd0383ab62
+
+Since asset price is bounded between (0,2) (`annualizedRate`) this postiton should be well above 1.25 (minimum CR ratio required). 
+
+**Current Status** - Over Collaterised (No risk of liquidation)
+
+## 2. Test Run Liquidator Bot - No Liquidations
+```console
+❯ yarn truffle exec ./packages/liquidator/index.js --network kovan_mnemonic
+yarn run v1.22.5
+$ /home/oreki_clr/Projects/UMAProject/protocol/node_modules/.bin/truffle exec ./packages/liquidator/index.js --network kovan_mnemonic
+Failed to initialize libusb.
+Using network 'kovan_mnemonic'.
+
+2021-03-14 14:22:07 [info]: {
+  "at": "Liquidator#index",
+  "message": "Liquidator started 🌊",
+  "financialContractAddress": "0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3",
+  "pollingDelay": 60,
+  "errorRetries": 3,
+  "errorRetriesTimeout": 1,
+  "priceFeedConfig": null,
+  "liquidatorConfig": {}
+}
+2021-03-14 14:22:10 [debug]: {
+  "at": "createReferencePriceFeedForFinancialContract",
+  "message": "Inferred default config from identifier or Financial Contract address",
+  "financialContractAddress": "0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3",
+  "identifier": "RaiRedemptionRate",
+  "defaultConfig": {
+    "type": "rairate",
+    "rateSetterAddress": "0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0",
+    "raiSubgraphUrl": "https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai",
+    "updateRateDelay": 10800,
+    "twapLength": 28800,
+    "historicalLookback": 28800,
+    "priceFeedDecimals": 18
+  }
+}
+2021-03-14 14:22:11 [debug]: {
+  "at": "createPriceFeed",
+  "message": "Creating RAIRedemptionRatePriceFeed",
+  "config": {
+    "type": "rairate",
+    "rateSetterAddress": "0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0",
+    "raiSubgraphUrl": "https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai",
+    "updateRateDelay": 10800,
+    "twapLength": 28800,
+    "historicalLookback": 28800,
+    "priceFeedDecimals": 18,
+    "lookback": 7200
+  }
+}
+2021-03-14 14:22:11 [debug]: {
+  "at": "GasEstimator",
+  "message": "Gas estimator updated",
+  "lastUpdateTimestamp": 1615731731,
+  "currentFastPriceGwei": 144
+}
+2021-03-14 14:22:11 [debug]: {
+  "at": "Liquidator#index",
+  "message": "Liquidator initialized",
+  "collateralDecimals": 18,
+  "syntheticDecimals": 18,
+  "priceFeedDecimals": 18,
+  "priceFeedConfig": null,
+  "liquidatorConfig": {
+    "contractVersion": "latest",
+    "contractType": "ExpiringMultiParty"
+  }
+}
+2021-03-14 14:22:19 [info]: {
+  "at": "Liquidator#index",
+  "message": "Approved Financial Contract to transfer unlimited synthetic tokens 💰",
+  "syntheticApprovalTx": "0xa49bbc4a76ac56c4e6e6f89bd24f371a9a9a29d5f01a8c1ac142e56aa1d6bfdf"
+}
+2021-03-14 14:22:20 [debug]: {
+  "at": "GasEstimator",
+  "message": "Gas estimator update skipped",
+  "currentTime": 1615731740,
+  "lastUpdateTimestamp": 1615731731,
+  "currentFastPriceGwei": 144,
+  "timeRemainingUntilUpdate": 51
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "FinancialContractClient",
+  "message": "Financial Contract state updated",
+  "lastUpdateTimestamp": "1615731740"
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "Liquidator",
+  "message": "Checking for liquidatable positions and preforming liquidations"
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "Liquidator",
+  "message": "Checking for under collateralized positions",
+  "liquidatorOverridePrice": null,
+  "latestCumulativeFundingRateMultiplier": "de0b6b3a7640000",
+  "inputPrice": "999999999988988357",
+  "scaledPrice": "979999999989208589",
+  "financialContractCRRatio": "1250000000000000000",
+  "maxCollateralPerToken": "1224999999986510736",
+  "crThreshold": 0.02
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "Liquidator",
+  "message": "No undercollateralized position"
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "Liquidator",
+  "message": "Checking for expired and disputed liquidations to withdraw rewards from"
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "Liquidator",
+  "message": "No withdrawable liquidations"
+}
+2021-03-14 14:22:21 [debug]: {
+  "at": "Liquidator#index",
+  "message": "End of execution loop - waiting polling delay",
+  "pollingDelay": "60 (s)"
+}
+```
+
+## 3. Forced Collateral Withdrawl
+We withdrawing excess collateral will cause our position to under collaterised. Since DApp won't allow such transactions to happen we will have to use etherscan write contract feature for this
+
+We will use `requestWithdrawal` method to withdraw 100 RAI to make our position under collaterialsed for testing.
+
+Withdrawl request Transction - https://kovan.etherscan.io/tx/0x6bc2a7ebfb63b359d9e34626739e6185f450772974d65a509e21f440fc246ff1
+
+**Current Status** - Under Collaterised (risk of liquidation)
+
+## 4. Test Run Liquidator Bot - Should Liquidate Postion
+```console
+❯ yarn truffle exec ./packages/liquidator/index.js --network kovan_mnemonic
+yarn run v1.22.5
+$ /home/oreki_clr/Projects/UMAProject/protocol/node_modules/.bin/truffle exec ./packages/liquidator/index.js --network kovan_mnemonic
+Failed to initialize libusb.
+Using network 'kovan_mnemonic'.
+
+2021-03-14 14:29:28 [info]: {
+  "at": "Liquidator#index",
+  "message": "Liquidator started 🌊",
+  "financialContractAddress": "0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3",
+  "pollingDelay": 60,
+  "errorRetries": 3,
+  "errorRetriesTimeout": 1,
+  "priceFeedConfig": null,
+  "liquidatorConfig": {}
+}
+2021-03-14 14:29:34 [debug]: {
+  "at": "createReferencePriceFeedForFinancialContract",
+  "message": "Inferred default config from identifier or Financial Contract address",
+  "financialContractAddress": "0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3",
+  "identifier": "RaiRedemptionRate",
+  "defaultConfig": {
+    "type": "rairate",
+    "rateSetterAddress": "0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0",
+    "raiSubgraphUrl": "https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai",
+    "updateRateDelay": 10800,
+    "twapLength": 28800,
+    "historicalLookback": 28800,
+    "priceFeedDecimals": 18
+  }
+}
+2021-03-14 14:29:34 [debug]: {
+  "at": "createPriceFeed",
+  "message": "Creating RAIRedemptionRatePriceFeed",
+  "config": {
+    "type": "rairate",
+    "rateSetterAddress": "0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0",
+    "raiSubgraphUrl": "https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai",
+    "updateRateDelay": 10800,
+    "twapLength": 28800,
+    "historicalLookback": 28800,
+    "priceFeedDecimals": 18,
+    "lookback": 7200
+  }
+}
+2021-03-14 14:29:34 [debug]: {
+  "at": "GasEstimator",
+  "message": "Gas estimator updated",
+  "lastUpdateTimestamp": 1615732174,
+  "currentFastPriceGwei": 144
+}
+2021-03-14 14:29:34 [debug]: {
+  "at": "Liquidator#index",
+  "message": "Liquidator initialized",
+  "collateralDecimals": 18,
+  "syntheticDecimals": 18,
+  "priceFeedDecimals": 18,
+  "priceFeedConfig": null,
+  "liquidatorConfig": {
+    "contractVersion": "latest",
+    "contractType": "ExpiringMultiParty"
+  }
+}
+2021-03-14 14:29:35 [debug]: {
+  "at": "GasEstimator",
+  "message": "Gas estimator update skipped",
+  "currentTime": 1615732175,
+  "lastUpdateTimestamp": 1615732174,
+  "currentFastPriceGwei": 144,
+  "timeRemainingUntilUpdate": 59
+}
+2021-03-14 14:29:36 [debug]: {
+  "at": "FinancialContractClient",
+  "message": "Financial Contract state updated",
+  "lastUpdateTimestamp": "1615732172"
+}
+2021-03-14 14:29:37 [debug]: {
+  "at": "Liquidator",
+  "message": "Checking for liquidatable positions and preforming liquidations"
+}
+2021-03-14 14:29:37 [debug]: {
+  "at": "Liquidator",
+  "message": "Checking for under collateralized positions",
+  "liquidatorOverridePrice": null,
+  "latestCumulativeFundingRateMultiplier": "de0b6b3a7640000",
+  "inputPrice": "999999999988993697",
+  "scaledPrice": "979999999989213823",
+  "financialContractCRRatio": "1250000000000000000",
+  "maxCollateralPerToken": "1224999999986517278",
+  "crThreshold": 0.02
+}
+2021-03-14 14:29:37 [debug]: {
+  "at": "Liquidator",
+  "message": "Detected a liquidatable position",
+  "scaledPrice": "979999999989213823",
+  "maxCollateralPerToken": "1224999999986517278",
+  "position": {
+    "sponsor": "0x1920F59D3De3cd1753fC677c9d431C99777B9a99",
+    "withdrawalRequestPassTimestamp": "1615739248",
+    "withdrawalRequestAmount": "100000000000000000000",
+    "numTokens": "100000000000000000000",
+    "amountCollateral": "200000000000000000000",
+    "hasPendingWithdrawal": true
+  }
+}
+2021-03-14 14:29:37 [debug]: {
+  "at": "Liquidator",
+  "message": "Liquidating position",
+  "position": {
+    "sponsor": "0x1920F59D3De3cd1753fC677c9d431C99777B9a99",
+    "withdrawalRequestPassTimestamp": "1615739248",
+    "withdrawalRequestAmount": "100000000000000000000",
+    "numTokens": "100000000000000000000",
+    "amountCollateral": "200000000000000000000",
+    "hasPendingWithdrawal": true
+  },
+  "inputPrice": "979999999989213823",
+  "minLiquidationPrice": "0",
+  "maxLiquidationPrice": "1224999999986517278",
+  "tokensToLiquidate": "100000000000000000000",
+  "txnConfig": {
+    "from": "0xfce1cb7EE0Ea8926c2BbCc68D1D927555F9f7256",
+    "gas": 522288,
+    "gasPrice": 144000000000
+  }
+}
+2021-03-14 14:29:48 [info]: {
+  "at": "Liquidator",
+  "message": "Position has been liquidated!🔫",
+  "position": {
+    "sponsor": "0x1920F59D3De3cd1753fC677c9d431C99777B9a99",
+    "withdrawalRequestPassTimestamp": "1615739248",
+    "withdrawalRequestAmount": "100000000000000000000",
+    "numTokens": "100000000000000000000",
+    "amountCollateral": "200000000000000000000",
+    "hasPendingWithdrawal": true
+  },
+  "inputPrice": "979999999989213823",
+  "txnConfig": {
+    "from": "0xfce1cb7EE0Ea8926c2BbCc68D1D927555F9f7256",
+    "gas": 522288,
+    "gasPrice": 144000000000
+  },
+  "liquidationResult": {
+    "tx": "0x14524acc9991903527f7ae71864143ec3156f55ef4981f702a0b693aafe4bc13",
+    "sponsor": "0x1920F59D3De3cd1753fC677c9d431C99777B9a99",
+    "liquidator": "0xfce1cb7EE0Ea8926c2BbCc68D1D927555F9f7256",
+    "liquidationId": "0",
+    "tokensOutstanding": "100000000000000000000",
+    "lockedCollateral": "200000000000000000000",
+    "liquidatedCollateral": "100000000000000000000"
+  }
+}
+2021-03-14 14:29:48 [debug]: {
+  "at": "Liquidator",
+  "message": "Checking for expired and disputed liquidations to withdraw rewards from"
+}
+2021-03-14 14:29:48 [debug]: {
+  "at": "Liquidator",
+  "message": "No withdrawable liquidations"
+}
+2021-03-14 14:29:48 [debug]: {
+  "at": "Liquidator#index",
+  "message": "End of execution loop - waiting polling delay",
+  "pollingDelay": "60 (s)"
+}
+```
+
+After liquidation is complete user can see this in DApp also.
+
+![image](https://user-images.githubusercontent.com/17181457/111083991-6f7b1e80-8536-11eb-9c86-d0ac454c3f02.png)
+
+
+## 5. Test Run Disputer Bot - Should Not Dispute
+```
+❯ yarn truffle exec ./packages/disputer/index.js --network kovan_mnemonic
+yarn run v1.22.5
+$ /home/oreki_clr/Projects/UMAProject/protocol/node_modules/.bin/truffle exec ./packages/disputer/index.js --network kovan_mnemonic
+Failed to initialize libusb.
+Using network 'kovan_mnemonic'.
+
+2021-03-14 14:31:45 [info]: {
+  "at": "Disputer#index",
+  "message": "Disputer started🔎",
+  "financialContractAddress": "0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3",
+  "pollingDelay": 60,
+  "errorRetries": 3,
+  "errorRetriesTimeout": 1,
+  "priceFeedConfig": null,
+  "disputerConfig": null
+}
+2021-03-14 14:31:46 [debug]: {
+  "at": "createReferencePriceFeedForFinancialContract",
+  "message": "Inferred default config from identifier or Financial Contract address",
+  "financialContractAddress": "0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3",
+  "identifier": "RaiRedemptionRate",
+  "defaultConfig": {
+    "type": "rairate",
+    "rateSetterAddress": "0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0",
+    "raiSubgraphUrl": "https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai",
+    "updateRateDelay": 10800,
+    "twapLength": 28800,
+    "historicalLookback": 28800,
+    "priceFeedDecimals": 18
+  }
+}
+2021-03-14 14:31:47 [debug]: {
+  "at": "createPriceFeed",
+  "message": "Creating RAIRedemptionRatePriceFeed",
+  "config": {
+    "type": "rairate",
+    "rateSetterAddress": "0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0",
+    "raiSubgraphUrl": "https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai",
+    "updateRateDelay": 10800,
+    "twapLength": 28800,
+    "historicalLookback": 28800,
+    "priceFeedDecimals": 18,
+    "lookback": 7200
+  }
+}
+2021-03-14 14:31:47 [debug]: {
+  "at": "GasEstimator",
+  "message": "Gas estimator updated",
+  "lastUpdateTimestamp": 1615732307,
+  "currentFastPriceGwei": 144
+}
+2021-03-14 14:31:47 [debug]: {
+  "at": "Disputer#index",
+  "message": "Disputer initialized",
+  "collateralDecimals": 18,
+  "syntheticDecimals": 18,
+  "priceFeedDecimals": 18,
+  "priceFeedConfig": null,
+  "disputerConfig": {
+    "contractVersion": "latest",
+    "contractType": "ExpiringMultiParty"
+  }
+}
+2021-03-14 14:31:47 [debug]: {
+  "at": "GasEstimator",
+  "message": "Gas estimator update skipped",
+  "currentTime": 1615732307,
+  "lastUpdateTimestamp": 1615732307,
+  "currentFastPriceGwei": 144,
+  "timeRemainingUntilUpdate": 60
+}
+2021-03-14 14:31:49 [debug]: {
+  "at": "FinancialContractClient",
+  "message": "Financial Contract state updated",
+  "lastUpdateTimestamp": "1615732304"
+}
+2021-03-14 14:31:49 [debug]: {
+  "at": "Disputer",
+  "message": "Checking for any disputable liquidations"
+}
+2021-03-14 14:31:49 [debug]: {
+  "at": "Disputer",
+  "message": "No disputable liquidations"
+}
+2021-03-14 14:31:49 [debug]: {
+  "at": "Disputer",
+  "message": "Checking for disputed liquidations that may have resolved"
+}
+2021-03-14 14:31:49 [debug]: {
+  "at": "Disputer",
+  "message": "No withdrawable disputes"
+}
+2021-03-14 14:31:49 [debug]: {
+  "at": "Disputer#index",
+  "message": "End of execution loop - waiting polling delay",
+  "pollingDelay": "60 (s)"
+}
+```
 
 ## Refrence
 ### RAI
