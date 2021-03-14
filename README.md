@@ -10,13 +10,13 @@ redemption rate movements using [UMA](https://docs.umaproject.org/build-walkthro
 
 # <pre>**# Overview**</pre>
 
-UMA is a fast, flexible and secure way to create synthetic assets on Ethereum. UMA has defined a novel architecture
+UMA is a fast, flexible, and secure way to create synthetic assets on Ethereum. UMA has defined a novel architecture
 that enables anyone to create a synth asset that can track virtually anything from stock markets in Iran to gas 
 fees on Ethereum safely and securely.
 
-In this challenge I created a synth asset `RR-RAI-APR21` tracking RAI redemption rate.
+In this challenge, I created a synth asset `RR-RAI-APR21` tracking the RAI redemption rate.
 
-Also a DApp (fork of UMAProtocol/emp-tools) to interact with my EMP and manage/create their positions.
+Also, a DApp (a fork of UMAProtocol/emp-tools) to interact with my EMP and manage/create their positions.
 
 https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
@@ -28,21 +28,21 @@ https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 ```
 redemptionRate = Redemption_Rate + 1
 ```
-Therefore `redemptionRate` is bound in (0,2) which makes it a sensible candiadate to track our synthetic asset. But `redemptionRate` changes very slowly and is almost constant upto few decimals. For example, these are some consecutive value for `redemptionRate` :-
+Therefore `redemptionRate` is bound in (0,2) which makes it a sensible candidate to track our synthetic asset. But `redemptionRate` changes very slowly and is almost constant up to few decimals. For example, these are some consecutive value for `redemptionRate` :-
 ```
 0.99999999984948877039244582
 0.999999999848547411861463422,     // Starting 10 decimals are almost consatnt
 0.999999999848547690004497233.
 ```
 
-To mitigate this for somme extent we can use `annualizedRate` which is scaled version of redemptionRate.
+To mitigate this to some extent we can use `annualizedRate` which is a scaled version of redemptionRate.
 ```
 annualizedRate = (redemptionRate) ^ (365 * 12 * 30 * 24 * 3600)
 ```
 
-I avoided using complex scaling methods to keep implementaion as simple as possible. (In case of dispute, every UMA shareholder should be able to calculate correct price without any issue. Also same price value should be reproducable accross different programming languages like python, bash upto 18 decimals (Wei) incase someone decides to use different langauge)
+I avoided using complex scaling methods to keep the implementation as simple as possible. (In case of dispute, every UMA shareholder should be able to calculate the correct price without any issue. Also, the same price value should be reproducible across different programming languages like python, bash up to 18 decimals (Wei) in case someone decides to use a different language)
 
-Lastly, to prevent market manuplation due to flash loans and other factors which can make `Redemption_Rate` volatile for very short period (which can casue sudden liquidations) so we should take Time Weighted Average Price (TWAP) of `annualizedRate`.
+Lastly, to prevent market manipulation due to flash loans and other factors which can make `Redemption_Rate` volatile for a very short period (which can cause sudden liquidations) so we should take Time Weighted Average Price (TWAP) of `annualizedRate`.
 
 ### PriceFeed Implementation
 Sources of data :- 
@@ -50,12 +50,12 @@ Sources of data :-
 - `UpdateRedemptionRate` Event from [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#events) contract
 
 
-`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default) of `annualizedRate`. While calculating TWAP timestamp of asset price should be accurate so for that purpose we will use timestamp of block in which `redemptionRate` is changed (or `UpdateRedemptionRate` event block time).
+`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default) of `annualizedRate`. While calculating TWAP timestamp of asset price should be accurate so for that purpose we will use the timestamp of the block in which `redemptionRate` is changed (or `UpdateRedemptionRate` event block time).
 
 Since `redemptionRate` is updated every `updateRateDelay` (saved in [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#readContract)) seconds, for Kovan it is 3 Hrs so TWAP length is kept 8 hrs to make sure atleast 2 `annualizedRate` are used to calculate price.
-Also sometimes there is delay of 15min in rate updation ( see https://discord.com/channels/698935373568540753/698936206691401759/818863474364514352 for full discussion).
+Also sometimes there is a delay of 15min in rate updation ( see https://discord.com/channels/698935373568540753/698936206691401759/818863474364514352 for full discussion).
 
-There can be a delay of about 40-60s (or sometimes more) in indexing new events to subgraph, that can lead to wrong calculation of TWAP as there might be a new price which is not indexed in subgraph yet, so to prevent this we employ following logic
+There can be a delay of about 40-60s (or sometimes more) in indexing new events to subgraph, which can lead to wrong calculation of TWAP as there might be a new price that is not indexed in the subgraph yet, so to prevent this we employ the following logic
 
 ```
 PRICES = QUERY_SUBGRAPH()                         // Fetch prices from subgraph (with block number to compute timestamp)
@@ -76,25 +76,25 @@ CURRENT_PRICE = TWAP(PRICES)
 
 **Why don't just read `redemptionRate` from `OracleRelayer` ?**
 
-Problem is that we need timestamp for a given price also inorder to calculate correct TWAP, reading the value from contract will not give us timestamp of price. 
+Problem is that we need a timestamp for a given price also in order to calculate the correct TWAP, reading the value from the contract will not give us a timestamp of price. 
 
 
 ### Code & Tests
-The full implementation of price feed with unit tests is contained in UMA protocol repo's fork.
+The full implementation of price feed with unit tests is contained in the UMA protocol repo's fork.
 https://github.com/ashutoshvarma/protocol
 
 **RaiRedemptionPriceFeed** - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/src/price-feed/RAIRedemptionRatePriceFeed.js)
 
 **Unit tests** - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/test/truffle/RAIRedemptionRatePriceFeed.js)
 
-Also default price-feed configuration has been added for bots to work with minimal configuration - [eacb633](https://github.com/ashutoshvarma/protocol/commit/eacb6338ab598d28e0a30fcf4050154087b159cd)
+Also, default price-feed configuration has been added for bots to work with minimal configuration - [eacb633](https://github.com/ashutoshvarma/protocol/commit/eacb6338ab598d28e0a30fcf4050154087b159cd)
  
 
-_UMA's `Networker` class does not support sending POST requests which was nesseary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR_ https://github.com/UMAprotocol/protocol/pull/2691
+_UMA's `Networker` class does not support sending POST requests which were necessary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR_ https://github.com/UMAprotocol/protocol/pull/2691
 
 
 # <pre>**# Deployment**</pre>
-**An EMP UMA Contract and Token** has been deployed to the Kovan testnet and a **UMA liquidation & disputer bot** is configured to use the `RaiRedemptionPriceFeed`.
+**An EMP UMA Contract and Token** has been deployed to the Kovan test net and a **UMA liquidation & disputer bot** is configured to use the `RaiRedemptionPriceFeed`.
 
 ## Setup Configuration
 ### 1. Collateral Currency - `RAI`
@@ -132,7 +132,7 @@ Deployed at
 
 https://kovan.etherscan.io/address/0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
 
-_While trying to deploy EMP using UMAProject/launch-emp scripts I faced some errors due to incompatibility between old ganache-cli version and node 14, I made a small PR for this also_ ,https://github.com/UMAprotocol/launch-emp/pull/14
+_While trying to deploy EMP using UMAProject/launch-emp scripts I faced some errors due to incompatibility between the old ganache-CLI version and node 14, I made a small PR for this also_ ,https://github.com/UMAprotocol/launch-emp/pull/14
 
 
 # <pre>**# Uniswap Pool - `RAI` & `RR-RAI-APR21`**</pre>
@@ -150,13 +150,13 @@ https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA
 
 **Source** - https://github.com/ashutoshvarma/emp-tools
 
-A Simple DApp to interact with EMP, manage position, deposit collateral, redeem synth and view positions or liquidations.
+A Simple DApp to interact with EMP, manage the position, deposit collateral, redeem synth and view positions or liquidations.
 (Fork from [emp-tools](https://github.com/UMAprotocol/emp-tools/))
 
 ### Changes made to original `emp-tools` for supporting RAI EMP contract 
-1. Disbale DevMining interfaces
+1. Disable DevMining interfaces
 2. Use updated EMP ABI.
-3. Replace Old EMP ABI methods with updated one.
+3. Replace Old EMP ABI methods with the updated ones.
 4. Add dummy price config for `RR-RAI-APR21` synth.
 
 ![image](https://user-images.githubusercontent.com/17181457/111082409-1e672c80-852e-11eb-8b11-5eddda7493cf.png)
@@ -172,7 +172,7 @@ Since no breaking changes were made to this, no new tests are written. Old tests
 ### Liquidator Bot Config
 **Liquidator Address** - https://kovan.etherscan.io/address/0xfce1cb7ee0ea8926c2bbcc68d1d927555f9f7256
 
-Added 150 RAI, 100 RR-RAI-APR21 and some ETH to liquidator address (see for more info https://docs.umaproject.org/developers/bots#funding-accounts)
+Added 150 RAI, 100 RR-RAI-APR21, and some ETH to liquidator address (see for more info https://docs.umaproject.org/developers/bots#funding-accounts)
 
 ```
 SLACK_WEBHOOK=https://hooks.slack.com/services/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
@@ -184,7 +184,7 @@ COMMAND=yarn truffle exec ./packages/liquidator/index.js --network kovan_mnemoni
 ### Disputer Bot Config
 **Disputer Address** - https://kovan.etherscan.io/address/0x384681B59E798E345dE15D9be9362FC63E00f7f5
 
-Added 150 RAI, 100 RR-RAI-APR21 and some ETH to Disputer address (see for more info https://docs.umaproject.org/developers/bots#funding-accounts)
+Added 150 RAI, 100 RR-RAI-APR21, and some ETH to Disputer address (see for more info https://docs.umaproject.org/developers/bots#funding-accounts)
 
 ```
 SLACK_WEBHOOK=https://hooks.slack.com/services/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
@@ -193,14 +193,14 @@ EMP_ADDRESS=0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
 COMMAND=yarn truffle exec ./packages/disputer/index.js --network kovan_mnemonic
 ```
 
-## 1. Miniting
+## 1. Minting
 A new position is created where `200` RAI is deposited for 100 `RR-RAI-APR21`
 
 **Sponsor** - 0x1920F59D3De3cd1753fC677c9d431C99777B9a99
 
 **Transcation** - https://kovan.etherscan.io/tx/0x717b5c305ab2abbdd29a8cab62a99cbdf66469f1ce6b7de69d310ddd0383ab62
 
-Since asset price is bounded between (0,2) (`annualizedRate`) this postiton should be well above 1.25 (minimum CR ratio required). 
+Since asset price is bounded between (0,2) (`annualizedRate`) this position should be well above 1.25 (minimum CR ratio required). 
 
 **Current Status** - Over Collaterised (No risk of liquidation)
 
@@ -322,11 +322,11 @@ Using network 'kovan_mnemonic'.
 ```
 
 ## 3. Forced Collateral Withdrawl
-We withdrawing excess collateral will cause our position to under collaterised. Since DApp won't allow such transactions to happen we will have to use etherscan write contract feature for this
+We withdrawing excess collateral will cause our position to under collateralized. Since DApp won't allow such transactions to happen we will have to use etherscan write contract feature for this
 
-We will use `requestWithdrawal` method to withdraw 100 RAI to make our position under collaterialsed for testing.
+We will use the `requestWithdrawal` method to withdraw 100 RAI to make our position under collateralized for testing.
 
-Withdrawl request Transction - https://kovan.etherscan.io/tx/0x6bc2a7ebfb63b359d9e34626739e6185f450772974d65a509e21f440fc246ff1
+Withdrawl request Transaction - https://kovan.etherscan.io/tx/0x6bc2a7ebfb63b359d9e34626739e6185f450772974d65a509e21f440fc246ff1
 
 **Current Status** - Under Collaterised (risk of liquidation)
 
@@ -500,7 +500,7 @@ Using network 'kovan_mnemonic'.
 }
 ```
 
-After liquidation is complete user can see this in DApp also.
+After liquidation is the complete user can see this in DApp also.
 
 ![image](https://user-images.githubusercontent.com/17181457/111083991-6f7b1e80-8536-11eb-9c86-d0ac454c3f02.png)
 
@@ -606,7 +606,7 @@ Using network 'kovan_mnemonic'.
 }
 ```
 
-## Refrence
+# <pre> **# Refrence** </pre>
 ### RAI
 
 * **OracleRelayer**:- [Source](https://github.com/reflexer-labs/geb/blob/master/src/OracleRelayer.sol),
