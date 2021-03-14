@@ -86,62 +86,72 @@ https://github.com/ashutoshvarma/protocol
 **RaiRedemptionPriceFeed** - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/src/price-feed/RAIRedemptionRatePriceFeed.js)
 
 **Unit tests** - [here](https://github.com/ashutoshvarma/protocol/blob/master/packages/financial-templates-lib/test/truffle/RAIRedemptionRatePriceFeed.js)
+
+Also default price-feed configuration has been added for bots to work with minimal configuration - [eacb633](https://github.com/ashutoshvarma/protocol/commit/eacb6338ab598d28e0a30fcf4050154087b159cd)
  
 
 _UMA's `Networker` class does not support sending POST requests which was nesseary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR_ https://github.com/UMAprotocol/protocol/pull/2691
 
 
-## <pre>**Deployment and Testing**</pre>
-1. `RaiRedemptionPriceFeed` code has been tested with unit tests in the fork repo.
-2. EMP UMA Contract (along with Synth Token) has been deployed to Kovan Testnet
-3. Default price-feed configuration for has been added for bots to work with minimal configuration - [eacb633](https://github.com/ashutoshvarma/protocol/commit/eacb6338ab598d28e0a30fcf4050154087b159cd)
-4. Uniswap Swap Pool (RAI-Synth) has been made to trade synths - [here](https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA4DFa07C2)
-5. Deployed a Dapp to interact with EMP, manage position, deposit collateral, redeem synth and view positions or liquidations. (Fork from [emp-tools](https://github.com/UMAprotocol/emp-tools/)) - [Here](https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/?address=0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3)
+# <pre>**Deployment**</pre>
+**An EMP UMA Contract and Token** has been deployed to the Kovan testnet and a **UMA liquidation & disputer bot** is configured to use the `RaiRedemptionPriceFeed`.
 
-## Setup & Configuration
-### Collateral Currency - RAI
+## Setup Configuration
+### 1. Collateral Currency - `RAI`
+```
+"symbol":           "RAI",
+"name":             "Rai Reflex Index"
+"address":          "0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd",
+"decimals":         18,
+```
 Added buy UMA team to `
 AddressWhitelist`. through this [transaction](https://kovan.etherscan.io/tx/0x006f18d76ba32ae42e2ca73eea703c9c5574c835773b447342bd46e71964ae6f)
 
-### Price Indentifier Name - `RaiRedemptionRate`
+### 2. Price Indentifier Name - `RaiRedemptionRate`
 Added by UMA Team to `IdentifierWhitelist` through this [transaction](https://kovan.etherscan.io/tx/0x5cc0ccb70a86480af46385105d1b3e6318554df7c503ee43c055de77a0fb2b9b)
 
-### Synth Token - `RR-RAI-APR21`
+### 2. Synth Token - `RR-RAI-APR21`
 ```
-syntheticName: "RAI Redemption Rate [RR April 2021]", 
-syntheticSymbol: 'RR-RAI-APR21', 
+syntheticName:      "RAI Redemption Rate [RR April 2021]", 
+syntheticSymbol:    "RR-RAI-APR21", 
 ```
 Token Deployed (by EMP) at 
 https://kovan.etherscan.io/token/0xcac5b5ac9f4af1a4b73a12cd007a64ba4dfa07c2
 
-
-### EMP Parameteres
+### 3. EMP Parameteres
 ```
-Expiry date: 30/04/2021, 16:30:00 UTC
-Price identifier: RaiRedemptionRate
+Expiry date:            30/04/2021, 16:30:00 UTC
+Price identifier:       RaiRedemptionRate
 Collateral requirement: 1.25
-Unique sponsors: 1
+Unique sponsors:        1
 Minimum sponsor tokens: 100.0 RR-RAI-APR21
 ```
+(This EMP will expire at the end of April 2021 and synth holders can redeem their token then.)
 
-EMP Contract Deployed  to Kovan using launch-emp scipts provided by UMA at
+Deployed at
+
 https://kovan.etherscan.io/address/0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
 
+_While trying to deploy EMP using UMAProject/launch-emp scripts I faced some errors due to incompatibility between old ganache-cli version and node 14, I made a small PR for this also_ ,https://github.com/UMAprotocol/launch-emp/pull/14
 
-## DApp
-Deployed - https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
-Source - https://github.com/ashutoshvarma/emp-tools
+# <pre>**LIVE DApp**</pre>
 
-![image](https://user-images.githubusercontent.com/17181457/111078364-06d27880-851b-11eb-869d-c1a416fc26d6.png)
+**Live** - https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
+
+**Source** - https://github.com/ashutoshvarma/emp-tools
 
 A Simple DApp to interact with EMP, manage position, deposit collateral, redeem synth and view positions or liquidations.
 (Fork from [emp-tools](https://github.com/UMAprotocol/emp-tools/))
 
-### Changes made to make it compatible with RAI EMP contract 
+### Changes made to original `emp-tools` for supporting RAI EMP contract 
 1. Disbale DevMining interfaces
-2. Replace Old EMP ABI methods with updated one.
-3. Add dummy price config for `RR-RAI-APR21` synth.
+2. Use updated EMP ABI.
+3. Replace Old EMP ABI methods with updated one.
+4. Add dummy price config for `RR-RAI-APR21` synth.
+
+![image](https://user-images.githubusercontent.com/17181457/111082409-1e672c80-852e-11eb-8b11-5eddda7493cf.png)
+
 
 ## Refrence
 ### RAI
@@ -164,5 +174,8 @@ A Simple DApp to interact with EMP, manage position, deposit collateral, redeem 
 #### Bots
 
 * Bot parametrization https://docs.umaproject.org/developers/bot-param
+
+
+
 
 
