@@ -136,7 +136,7 @@ _While trying to deploy EMP using UMAProject/launch-emp scripts I faced some err
 
 
 # <pre>**# Uniswap Pool - `RAI` & `RR-RAI-APR21`**</pre>
-Create and add liquidity to Kovan Uniswap Pool of `RAI` and ``RR-RAI-APR21``.
+Created the pool and added the initial liquidity to Kovan Uniswap Pool of `RAI` and ``RR-RAI-APR21``.
 
 https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA4DFa07C2
 
@@ -323,7 +323,7 @@ Using network 'kovan_mnemonic'.
 ```
 
 ## 3. Forced Collateral Withdrawl
-We withdrawing excess collateral will cause our position to under collateralized. Since DApp won't allow such transactions to happen we will have to use etherscan write contract feature for this
+Withdrawing large amount of collateral can cause our position to under collateralized. Since DApp won't allow such transactions to happen we will have to use etherscan write contract feature for this
 
 We will use the `requestWithdrawal` method to withdraw 100 RAI to make our position under collateralized for testing.
 
