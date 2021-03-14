@@ -142,7 +142,7 @@ https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA
 
 **Pool Address** - https://kovan.etherscan.io/address/0xff0ca43fc5444dc464177cbd82419d42db1af761#tokentxns
 
-**NOTE**:- You might need to import `RAI` & `RR-RAI-APR21` tokens in uniswap.
+**NOTE**:- You might need to import `RAI` & `RR-RAI-APR21` tokens in uniswap in-order to swap.
 
 # <pre>**LIVE DApp**</pre>
 
@@ -160,6 +160,8 @@ A Simple DApp to interact with EMP, manage position, deposit collateral, redeem 
 4. Add dummy price config for `RR-RAI-APR21` synth.
 
 ![image](https://user-images.githubusercontent.com/17181457/111082409-1e672c80-852e-11eb-8b11-5eddda7493cf.png)
+![image](https://user-images.githubusercontent.com/17181457/111082932-ffb66500-8530-11eb-9286-b0c242d00a85.png)
+![image](https://user-images.githubusercontent.com/17181457/111082962-21175100-8531-11eb-809b-d092f4b0ee4e.png)
 
 
 ## Refrence
