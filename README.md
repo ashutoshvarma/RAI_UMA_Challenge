@@ -50,7 +50,7 @@ Sources of data :-
 - `UpdateRedemptionRate` Event from [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#events) contract
 
 
-`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default) of `annualizedRate`. While calculating TWAP timestamp of asset price should be accurate so for that purpose we will use the timestamp of the block in which `redemptionRate` is changed (or `UpdateRedemptionRate` event block time).
+`RaiRedemptionPriceFeed.js` calculates  TWAP (8 hours by default) of `annualizedRate`. While calculating TWAP, timestamp of asset price should be accurate so for that purpose we will use the timestamp of the block in which `redemptionRate` is changed (or `UpdateRedemptionRate` event block time).
 
 Since `redemptionRate` is updated every `updateRateDelay` (saved in [`RateSetter`](https://kovan.etherscan.io/address/0x0641C280B21A31daf1518a91A68Ad396EcC6f2f0#readContract)) seconds, for Kovan it is 3 Hrs so TWAP length is kept 8 hrs to make sure atleast 2 `annualizedRate` are used to calculate price.
 Also sometimes there is a delay of 15min in rate updation ( see https://discord.com/channels/698935373568540753/698936206691401759/818863474364514352 for full discussion).
