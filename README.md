@@ -8,7 +8,7 @@ To build a synthetic asset tracking the
 [Kovan RAI](https://github.com/reflexer-labs/geb-changelog/tree/master/releases/kovan/1.4.0/median/fixed-discount)
 redemption rate movements using [UMA](https://docs.umaproject.org/build-walkthrough/build-process).
 
-# <pre>**Overview**</pre>
+# <pre>**# Overview**</pre>
 
 UMA is a fast, flexible and secure way to create synthetic assets on Ethereum. UMA has defined a novel architecture
 that enables anyone to create a synth asset that can track virtually anything from stock markets in Iran to gas 
@@ -21,7 +21,7 @@ Also a DApp (fork of UMAProtocol/emp-tools) to interact with my EMP and manage/c
 https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
 
-# <pre>**Solution**</pre>
+# <pre>**# Solution**</pre>
 
 ## Pricing Model
 `Redemption_Rate` is the rate at which RAI is being devalued or revalued, it can therefore be negative as well. It is stored as `redemptionRate` in `OracleRelayer` relayer contract. Mathematically,
@@ -93,7 +93,7 @@ Also default price-feed configuration has been added for bots to work with minim
 _UMA's `Networker` class does not support sending POST requests which was nesseary in order to query subgraphs. To add support for POST requests I made few small changes to it. Here is the PR_ https://github.com/UMAprotocol/protocol/pull/2691
 
 
-# <pre>**Deployment**</pre>
+# <pre>**# Deployment**</pre>
 **An EMP UMA Contract and Token** has been deployed to the Kovan testnet and a **UMA liquidation & disputer bot** is configured to use the `RaiRedemptionPriceFeed`.
 
 ## Setup Configuration
@@ -135,7 +135,7 @@ https://kovan.etherscan.io/address/0x08eA186755Ad743897c00AAfaEF7Fb9A7EcE8cf3
 _While trying to deploy EMP using UMAProject/launch-emp scripts I faced some errors due to incompatibility between old ganache-cli version and node 14, I made a small PR for this also_ ,https://github.com/UMAprotocol/launch-emp/pull/14
 
 
-# <pre>**Uniswap Pool - `RAI` & `RR-RAI-APR21`**</pre>
+# <pre>**# Uniswap Pool - `RAI` & `RR-RAI-APR21`**</pre>
 Create and add liquidity to Kovan Uniswap Pool of `RAI` and ``RR-RAI-APR21``.
 
 https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA4DFa07C2
@@ -144,7 +144,7 @@ https://app.uniswap.org/#/swap?outputCurrency=0xCaC5B5AC9F4af1A4b73a12CD007A64BA
 
 **NOTE**:- You might need to import `RAI` & `RR-RAI-APR21` tokens in uniswap in-order to swap.
 
-# <pre>**LIVE DApp**</pre>
+# <pre>**# LIVE DApp**</pre>
 
 **Live** - https://emp-tools-2391flb9z-ashutoshvarma.vercel.app/
 
@@ -166,7 +166,7 @@ A Simple DApp to interact with EMP, manage position, deposit collateral, redeem 
 Since no breaking changes were made to this, no new tests are written. Old tests are still passing by the way.
 
 
-# <pre>**Testing the Deployment**</pre> 
+# <pre>**# Testing the Deployment**</pre> 
 **(All the interactions with EMP contract is done using the above DApp.)**
 ## Preperation
 ### Liquidator Bot Config
