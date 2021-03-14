@@ -1,7 +1,7 @@
 # RAI X UMA Challenge by Reflexer Labs
 
 
-# <pre>**Challenge**</pre>
+# <pre>**# Challenge**</pre>
 https://gitcoin.co/issue/reflexer-labs/geb/97/100024834
 
 To build a synthetic asset tracking the
