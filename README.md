@@ -501,7 +501,7 @@ Using network 'kovan_mnemonic'.
 }
 ```
 
-After liquidation is the complete user can see this in DApp also.
+After liquidation is complete user can see this in DApp also.
 
 ![image](https://user-images.githubusercontent.com/17181457/111083991-6f7b1e80-8536-11eb-9c86-d0ac454c3f02.png)
 
